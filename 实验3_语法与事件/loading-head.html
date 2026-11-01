@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>head中的脚本 | 栈间笔记</title>
+<link rel="stylesheet" href="css/site.css">
+<script>
+// 此时按钮尚未解析，值为 null；load 之后才能成功找到按钮。
+window.headProbe = document.getElementById('demo-button');
+console.log('head 直接查找：', window.headProbe);
+window.onload = function () {
+  const button = document.getElementById('demo-button');
+  const log = document.getElementById('placement-log');
+  log.textContent = 'head 内直接查找：' + String(window.headProbe) + '\nwindow.onload 后：成功找到按钮。';
+  button.onclick = function () { console.log('head/onload 按钮触发'); log.textContent += '\n点击事件触发：head + window.onload。'; };
+};
+</script>
+</head>
+<body><main class="container" id="main-content" style="margin-top:2rem"><section class="panel"><h1>JS 代码位置与加载顺序</h1><p id="placement-desc" class="muted">head 内联脚本使用 window.onload，等待 DOM 和页面资源加载后绑定事件。</p><div class="actions"><button type="button" id="demo-button">点击输出信息</button><a href="index.html">返回实验3</a></div><pre id="placement-log" class="code-log"></pre></section></main><footer class="site-footer"><div class="container footer-row"><p>栈间笔记 · Web 全栈开发技术实验</p><a href="#top">回到顶部 ↑</a></div></footer></body></html>
