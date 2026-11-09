@@ -19,7 +19,7 @@ Vue 3.5.44与Vue Router 4.6.3已固定下载到vendor，主版本不需要npm、
 
 ## Vite扩展
 
-进入`实验6/Vite工程`执行`npm ci`、`npm run dev`。生产构建为`npm run build`，预览为`npm run preview`。工程含App.vue和BuildInfo.vue，复用同一套选项式组件；已提供构建产物dist。依赖采用锁文件，不提交node_modules。
+进入`实验6/Vite工程`执行`npm ci`、`npm run dev`。生产构建为`npm run build`，预览为`npm run preview`。工程含App.vue和BuildInfo.vue，复用同一套选项式组件；执行构建后会生成dist；本地提交包另含已验证的构建产物。依赖采用锁文件，不提交node_modules。
 
 本实现为教学用客户端应用。留言和任务只存同源浏览器，不含后端账号或跨设备同步。v-html仅展示可信静态片段；用户留言使用文本插值。
 
