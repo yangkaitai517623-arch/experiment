@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>实验5-1 · 指令练习 | 栈间笔记</title>
+    <link rel="stylesheet" href="css/site.css" />
+    <script src="vendor/vue.global.js" defer></script>
+    <script src="js/directives.js" defer></script>
+  </head>
+  <body id="top">
+    <noscript>请启用JavaScript以运行Vue实验。</noscript>
+    <div id="app" v-cloak>
+      <header class="site-header">
+        <div class="container header-row">
+          <a class="brand" href="index.html"
+            ><img
+              src="assets/logo.svg"
+              width="36"
+              height="36"
+              alt=""
+            />栈间笔记</a
+          >
+          <nav class="nav" aria-label="主导航">
+            <a href="index.html">博客</a><a href="directives.html">指令练习</a
+            ><a href="todos.html">学习清单</a
+            ><a href="../../实验6/代码/index.html">组件与路由 →</a>
+          </nav>
+        </div>
+      </header>
+      <main class="container">
+        <div class="page-head">
+          <p class="eyebrow">VUE / DIRECTIVE NOTEBOOK</p>
+          <h1>把指令，变成可操作的例子。</h1>
+          <p>每块练习都有输入、状态与结果，对照指令的实际行为。</p>
+        </div>
+        <div class="directives">
+          <section class="panel" id="bind-demo">
+            <p class="directive-tag">01 / v-bind · :class · :style</p>
+            <h2>属性和样式绑定</h2>
+            <label for="color">强调颜色</label
+            ><select id="color" v-model="color">
+              <option value="#2257c4">蓝色</option>
+              <option value="#23694f">绿色</option>
+            </select>
+            <div class="checks">
+              <input
+                id="active-check"
+                type="checkbox"
+                v-model="isActive"
+              /><label for="active-check">应用激活类</label>
+            </div>
+            <p :class="myClass">类名字符串</p>
+            <p :class="{ 'demo-active':isActive,'demo-outline':true }">
+              对象形式绑定 class
+            </p>
+            <p
+              :class="['demo-outline','demo-rounded']"
+              :style="{color:color,fontSize:fontSize+'px'}"
+              id="style-result"
+            >
+              数组 class 与对象 style
+            </p>
+            <label for="font-size">字号 {{fontSize}} px</label
+            ><input
+              id="font-size"
+              type="range"
+              min="14"
+              max="26"
+              v-model.number="fontSize"
+            /><a
+              :href="resourceUrl"
+              :title="'前往'+resourceName"
+              target="_blank"
+              rel="noopener noreferrer"
+              >{{resourceName}} ↗</a
+            >
+          </section>
+          <section class="panel" id="if-demo">
+            <p class="directive-tag">02 / v-if · v-else-if · v-else</p>
+            <h2>按条件创建与销毁</h2>
+            <label for="score">成绩（0—100）</label
+            ><input
+              id="score"
+              type="number"
+              min="0"
+              max="100"
+              v-model.number="score"
+            />
+            <p class="demo-result" id="grade-result">
+              <span v-if="!validScore">请输入0—100之间的数值。</span
+              ><span v-else-if="score>=90">优秀</span
+              ><span v-else-if="score>=60">合格</span><span v-else>不合格</span>
+            </p>
+            <button
+              type="button"
+              id="toggle-flag"
+              class="secondary"
+              @click="flag=!flag"
+            >
+              切换可见状态
+            </button>
+            <div v-if="flag" id="if-node" class="demo-result">
+              v-if：关闭后节点不存在。
+            </div>
+            <div v-else class="muted">v-if 分支已被销毁。</div>
+          </section>
+          <section class="panel" id="show-demo">
+            <p class="directive-tag">03 / v-show</p>
+            <h2>保留节点，只改显示</h2>
+            <p class="muted">与上一块共用 flag，切换后观察这个区域。</p>
+            <div v-show="flag" id="show-node" class="demo-result">
+              v-show：隐藏时节点仍在DOM中。
+            </div>
+            <p>当前 flag：{{flag}}</p>
+          </section>
+          <section class="panel" id="for-demo">
+            <p class="directive-tag">04 / v-for · :key</p>
+            <h2>遍历对象数组与对象</h2>
+            <ul>
+              <li v-for="(book,index) in books" :key="book.id">
+                {{index+1}}. {{book.name}} · {{book.author}}
+              </li>
+            </ul>
+            <dl>
+              <template v-for="(value,key,index) in student" :key="key"
+                ><dt>{{index+1}} / {{key}}</dt>
+                <dd>{{value}}</dd></template
+              >
+            </dl>
+          </section>
+          <section class="panel" id="event-demo">
+            <p class="directive-tag">05 / v-on · @click · $event</p>
+            <h2>表达式、方法与参数</h2>
+            <div class="actions">
+              <button type="button" id="counter" @click="count++">
+                计数 {{count}}</button
+              ><button type="button" class="secondary" @click="showDate">
+                显示日期</button
+              ><button
+                type="button"
+                class="secondary"
+                @click="randomSix(100,300)"
+              >
+                生成6个整数</button
+              ><button
+                type="button"
+                id="native-event"
+                class="secondary"
+                @click="describeEvent('已收到',$event)"
+              >
+                查看原生事件
+              </button>
+            </div>
+            <p class="demo-result">
+              日期：{{now||'尚未获取'}}<br />随机数：{{numbers.join('、')||'尚未生成'}}<br /><span
+                id="event-result"
+                >{{eventInfo}}</span
+              >
+            </p>
+          </section>
+          <section class="panel" id="model-demo">
+            <p class="directive-tag">06 / v-model</p>
+            <h2>文本、复选框与单选框</h2>
+            <label for="my-name">姓名</label
+            ><input id="my-name" v-model="myName" />
+            <div class="choice-group">
+              <label v-for="hobby in ['绘画','网络小说','音乐']" :key="hobby"
+                ><input
+                  type="checkbox"
+                  :value="hobby"
+                  v-model="hobbies"
+                />{{hobby}}</label
+              >
+            </div>
+            <div class="choice-group">
+              <label><input type="radio" value="男" v-model="sex" />男</label
+              ><label><input type="radio" value="女" v-model="sex" />女</label>
+            </div>
+            <p class="demo-result" id="model-result">
+              姓名：{{myName||'未填写'}}；兴趣：{{hobbies.join('、')||'未选择'}}；性别：{{sex||'未选择'}}
+            </p>
+          </section>
+          <section class="panel" id="modifier-demo">
+            <p class="directive-tag">07 / .lazy · .number · .trim</p>
+            <h2>控制同步时机与值类型</h2>
+            <label for="lazy-name">姓名（失焦或change才同步）</label
+            ><input id="lazy-name" v-model.lazy="lazyName" /><label for="my-no"
+              >练习编号（不是实际学号）</label
+            ><input id="my-no" type="number" v-model.number="myNo" /><label
+              for="my-idea"
+              >意见（去首尾空格）</label
+            ><textarea id="my-idea" v-model.trim="myIdea"></textarea>
+            <p id="modifier-result" class="demo-result">
+              姓名：{{lazyName}}；编号：{{myNo}}（{{typeof
+              myNo}}）；意见：“{{myIdea}}”
+            </p>
+          </section>
+          <section class="panel" id="html-demo">
+            <p class="directive-tag">08 / v-html · v-text · 插值</p>
+            <h2>HTML与纯文本的区别</h2>
+            <p class="muted">
+              v-html只处理代码内固定的可信片段，不接收用户输入。
+            </p>
+            <div
+              class="demo-result"
+              v-html="trustedHtml"
+              id="html-result"
+            ></div>
+            <p class="demo-result" v-text="trustedHtml" id="text-result"></p>
+            <p class="demo-result" id="interpolation-result">
+              插值：{{trustedHtml}}
+            </p>
+          </section>
+        </div>
+      </main>
+      <footer class="site-footer">
+        <div class="container footer-row">
+          <p>栈间笔记 · Vue 学习实验</p>
+          <a href="#top">返回顶部 ↑</a>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

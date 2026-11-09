@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>实验5 · Vue博客 | 栈间笔记</title>
+    <link rel="stylesheet" href="css/site.css" />
+    <script src="vendor/vue.global.js" defer></script>
+    <script src="js/vue-data.js" defer></script>
+    <script src="js/utils.js" defer></script>
+    <script src="js/blog.js" defer></script>
+  </head>
+  <body id="top">
+    <noscript>请启用JavaScript以运行Vue实验。</noscript>
+    <div id="app" v-cloak>
+      <div :class="{night:night}" class="app-shell">
+        <header class="site-header">
+          <div class="container header-row">
+            <a class="brand" href="index.html"
+              ><img
+                src="assets/logo.svg"
+                width="36"
+                height="36"
+                alt=""
+              />栈间笔记</a
+            >
+            <nav class="nav" aria-label="主导航">
+              <a href="index.html">博客</a><a href="directives.html">指令练习</a
+              ><a href="todos.html">学习清单</a
+              ><a href="../../实验6/代码/index.html">组件与路由 →</a>
+            </nav>
+          </div>
+        </header>
+        <section class="hero">
+          <div class="container hero-row">
+            <div class="hero-copy">
+              <span class="hero-label">VUE / OPTIONS API</span>
+              <h1>让内容，随着想法更新。</h1>
+              <p>
+                保留熟悉的博客，用响应式数据重新组织文章搜索与留言。每次输入，都有清晰的回应。
+              </p>
+              <div class="actions">
+                <a class="button" href="#articles">阅读笔记 ↓</a
+                ><a class="button secondary" href="#guestbook">分享想法</a>
+              </div>
+            </div>
+            <img
+              class="hero-art"
+              src="assets/stack.svg"
+              width="480"
+              height="280"
+              alt="层叠的前端知识卡片"
+            />
+          </div>
+        </section>
+        <main class="container layout">
+          <div class="feed">
+            <section id="articles">
+              <div class="section-title">
+                <h2>我的学习笔记</h2>
+                <span id="article-count" class="meta"
+                  >显示 {{filteredArticles.length}} / 共 {{articles.length}}
+                  篇文章</span
+                >
+              </div>
+              <form
+                class="panel"
+                @submit.prevent="announceSearch"
+                id="search-form"
+              >
+                <div class="search-grid">
+                  <div class="field">
+                    <label for="keyword">标题关键词 · 即时搜索</label
+                    ><input
+                      id="keyword"
+                      type="search"
+                      v-model="keyword"
+                      placeholder="例如 CSS 或 JavaScript"
+                    />
+                  </div>
+                  <div class="field">
+                    <label for="category">分类</label
+                    ><select id="category" v-model="category">
+                      <option value="">全部分类</option>
+                      <option>HTML</option>
+                      <option>CSS</option>
+                      <option>JavaScript</option>
+                    </select>
+                  </div>
+                  <div class="actions">
+                    <button type="submit">搜索</button
+                    ><button
+                      type="button"
+                      id="reset-search"
+                      class="secondary"
+                      @click="resetSearch"
+                    >
+                      重置
+                    </button>
+                  </div>
+                </div>
+                <p class="search-feedback" id="search-feedback" role="status">
+                  {{searchFeedback}}
+                </p>
+              </form>
+              <div id="article-list">
+                <section v-if="!filteredArticles.length" class="empty-state">
+                  <h3>{{articles.length?'没有找到相关文章':'暂时没有文章'}}</h3>
+                  <p>试试其他关键词或分类，也可点击重置。</p>
+                </section>
+                <article
+                  v-for="article in filteredArticles"
+                  :key="article.id"
+                  class="article-card"
+                >
+                  <div class="article-top">
+                    <span class="tag">{{article.category}}</span
+                    ><time class="meta">{{article.date}}</time>
+                  </div>
+                  <h3>
+                    <a :href="'article.html?id='+article.id"
+                      >{{article.title}}</a
+                    >
+                  </h3>
+                  <p>{{article.summary}}</p>
+                  <a class="read" :href="'article.html?id='+article.id"
+                    >阅读笔记 · 约 {{article.minutes}} 分钟 →</a
+                  >
+                </article>
+              </div>
+            </section>
+            <section class="panel" id="guestbook">
+              <p class="eyebrow">V-MODEL / REF / WATCH</p>
+              <h2>给博客留一条消息</h2>
+              <form @submit.prevent="addMessage" id="message-form" novalidate>
+                <div class="field">
+                  <label for="nickname">昵称（1—20字）</label
+                  ><input
+                    id="nickname"
+                    ref="nicknameInput"
+                    v-model.trim="nickname"
+                    maxlength="20"
+                    autocomplete="nickname"
+                    :aria-invalid="!!messageError"
+                    aria-describedby="message-error"
+                  />
+                </div>
+                <div class="field">
+                  <label for="message">留言（1—300字）</label
+                  ><textarea
+                    id="message"
+                    v-model.trim="draft"
+                    maxlength="300"
+                    :aria-invalid="!!messageError"
+                    aria-describedby="message-error"
+                  ></textarea>
+                </div>
+                <div class="actions">
+                  <button type="submit">发表留言</button
+                  ><button
+                    type="button"
+                    class="secondary"
+                    @click="resetMessage"
+                  >
+                    重新填写
+                  </button>
+                </div>
+                <p id="message-error" class="hint error" aria-live="polite">
+                  {{messageError}}
+                </p>
+                <p id="message-status" class="meta" role="status">
+                  {{messageStatus}}
+                </p>
+              </form>
+              <p id="storage-note" class="storage-note">
+                {{storageNote || '留言仅保存到当前浏览器，不上传服务器。'}}
+              </p>
+              <div class="section-title">
+                <h3>留言列表</h3>
+                <p id="message-count" class="meta">
+                  共 {{messages.length}} 条留言
+                </p>
+              </div>
+              <p v-if="!messages.length" id="message-empty" class="muted">
+                还没有留言，来写下第一条吧。
+              </p>
+              <ul class="message-list">
+                <li
+                  v-for="message in messages"
+                  :key="message.id"
+                  class="message-item"
+                >
+                  <div class="message-header">
+                    <strong>{{message.name}}</strong
+                    ><button
+                      type="button"
+                      class="delete-message"
+                      @click="deleteMessage(message.id)"
+                      :aria-label="'删除'+message.name+'的留言'"
+                    >
+                      删除
+                    </button>
+                  </div>
+                  <p class="message-content">{{message.content}}</p>
+                  <time class="meta" :datetime="message.at"
+                    >{{formatTime(message.at)}}</time
+                  >
+                </li>
+              </ul>
+            </section>
+          </div>
+          <aside class="sidebar">
+            <section class="panel">
+              <img
+                class="avatar"
+                src="assets/avatar.svg"
+                width="80"
+                height="80"
+                alt="代码括号头像"
+              />
+              <h3>熟悉的页面，新的组织方式</h3>
+              <p class="muted">
+                从手动修改DOM，到让数据驱动视图。文章来自独立文件，筛选结果来自计算属性。
+              </p>
+            </section>
+            <section class="panel">
+              <h3>阅读偏好</h3>
+              <button
+                id="theme-toggle"
+                type="button"
+                @click="night=!night"
+                :aria-pressed="night"
+              >
+                {{night?'恢复日间':'切换夜间'}}
+              </button>
+            </section>
+            <section class="panel">
+              <h3>继续练习</h3>
+              <ul class="aside-list">
+                <li><a href="directives.html">指令与修饰符</a></li>
+                <li><a href="todos.html">可编辑的学习清单</a></li>
+                <li><a href="../../实验6/代码/index.html">组件与路由</a></li>
+              </ul>
+              <p class="version">Vue {{vueVersion}} · 本地依赖</p>
+            </section>
+          </aside>
+        </main>
+        <footer class="site-footer">
+          <div class="container footer-row">
+            <p>栈间笔记 · Vue 学习实验</p>
+            <a href="#top">返回顶部 ↑</a>
+          </div>
+        </footer>
+      </div>
+    </div>
+  </body>
+</html>
